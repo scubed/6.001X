@@ -99,8 +99,11 @@ def buildCoder(shift):
     shift: 0 <= int < 26
     returns: dict
     """
-    ### TODO.
-    return "Not yet implemented." # Remove this comment when you code the function
+    lower = string.ascii_lowercase
+    upper = string.ascii_uppercase
+    caesar = {k:lower[(lower.index(k)+shift)%26] for k in lower}
+    caesar.update({k:upper[(upper.index(k)+shift)%26] for k in upper})
+    return caesar
 
 def applyCoder(text, coder):
     """
@@ -110,8 +113,14 @@ def applyCoder(text, coder):
     coder: dict with mappings of characters to shifted characters
     returns: text after mapping coder chars to original text
     """
-    ### TODO.
-    return "Not yet implemented." # Remove this comment when you code the function
+    newtext = ""
+    for i in text:
+        if i in string.printable:
+            newtext += i
+        else:
+            newtext += coder.get(i, " ")
+    return newtext
+
 
 def applyShift(text, shift):
     """
@@ -124,9 +133,7 @@ def applyShift(text, shift):
     shift: amount to shift the text (0 <= int < 26)
     returns: text after being shifted by specified amount.
     """
-    ### TODO.
-    ### HINT: This is a wrapper function.
-    return "Not yet implemented." # Remove this comment when you code the function
+    return applyCoder(text, buildCoder(shift))
 
 #
 # Problem 2: Decryption
@@ -138,8 +145,22 @@ def findBestShift(wordList, text):
     text: string
     returns: 0 <= int < 26
     """
-    ### TODO
-    return "Not yet implemented." # Remove this comment when you code the function
+    bestWords = 0
+    shift = 0
+    bestShift = 0
+    count = 0
+    while bestWords < len(text.split()):
+        checkCaesar = applyShift(text, shift)
+        words = checkCaesar.split()
+        for i in words:
+            if isWord(wordList, i) == True:
+                count += 1
+        if count > bestWords:
+            bestWords = count
+            bestShift = shift
+        else:
+            shift += 1
+    print bestShift
 
 def decryptStory():
     """
@@ -150,18 +171,12 @@ def decryptStory():
 
     returns: string - story in plain text
     """
-    ### TODO.
-    return "Not yet implemented." # Remove this comment when you code the function
-
+    text = getStoryString()
+    wordList = loadWords()
+    return applyShift(text, findBestShift(wordList, text))
 #
 # Build data structures used for entire session and run encryption
 #
 
 if __name__ == '__main__':
-    # To test findBestShift:
-    wordList = loadWords()
-    s = applyShift('Hello, world!', 8)
-    bestShift = findBestShift(wordList, s)
-    assert applyShift(s, bestShift) == 'Hello, world!'
-    # To test decryptStory, comment the above four lines and uncomment this line:
-    #    decryptStory()
+    decryptStory()
